@@ -74,6 +74,8 @@ const generateToken = (id, role) => {
     let token = jwt.sign({id, role}, process.env.JWT_SECRET, {expiresIn: '30m'});
 
     return token;
+
+    // Token is changed
 }
 
 
