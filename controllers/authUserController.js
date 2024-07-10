@@ -10,15 +10,22 @@ export const registerUser = async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
-    const user = new User({
-        username, 
-        email, 
+    // Create user
+    const user = await User.create({
+        username,
+        email,
         password: hashedPassword,
         role: roles.user
     });
 
-    await user.save();
-    res.status(200).json("User is registered");
+    // await user.save();
+
+    res.json({
+        _id: user.id,
+        username: user.username,
+        email: user.email,
+        token: generateToken(user._id, user.role)
+    });
 }
 
 export const loginUser = async (req, res) => {
@@ -37,13 +44,36 @@ export const loginUser = async (req, res) => {
         return res.status(400).json("Incorrect username or password");
     }
 
-    const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '30m'});
-
-    const {password, ...otherDetails} = req.body;
+    const token = generateToken(user._id, user.role);
 
     res.cookie('user_token', token, {
         httpOnly: true
-    }).status(200).json({...otherDetails});
+    }).status(200).json({
+        _id: user.id,
+        username: user.username,
+        email: user.email,
+        token: token
+    });
+}
+
+export const logoutUser = async (req, res) => {
+    res.cookie('user_token', '', {
+        httpOnly: true,
+        expires: new Date(0)
+    });
+
+    res.status(200).json({message: 'User logged out'});
+}
+
+export const getMe = async (req, res) => {
+    res.status(200).json(req.user)
+}
+
+const generateToken = (id, role) => {
+
+    let token = jwt.sign({id, role}, process.env.JWT_SECRET, {expiresIn: '30m'});
+
+    return token;
 }
 
 
