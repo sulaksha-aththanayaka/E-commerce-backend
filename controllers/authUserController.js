@@ -7,6 +7,12 @@ import roles from '../utils/roles.js'
 export const registerUser = async (req, res) => {
     const {username, email, password} = req.body;
 
+    const OldUser = await User.findOne({email});
+
+    if(OldUser){
+        res.status(401).json("User available");
+    }
+
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -47,7 +53,8 @@ export const loginUser = async (req, res) => {
     const token = generateToken(user._id, user.role);
 
     res.cookie('user_token', token, {
-        httpOnly: true
+        httpOnly: true,
+        secure: false
     }).status(200).json({
         _id: user.id,
         username: user.username,
@@ -75,7 +82,6 @@ const generateToken = (id, role) => {
 
     return token;
 
-    // Token is changed
 }
 
 
