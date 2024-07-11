@@ -12,7 +12,13 @@ const app = express();
 const port = 5000;
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+// app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:5173', // replace with your front-end origin
+    credentials: true // this is crucial for cookies to be set
+}));
+
 
 const router = express.Router();
 
