@@ -15,7 +15,7 @@ app.use(cookieParser());
 // app.use(cors());
 
 app.use(cors({
-    origin: 'http://localhost:5173', // replace with your front-end origin
+    origin: ['http://localhost:5173', 'http://192.168.43.243:3000'],// replace with your front-end origin
     credentials: true // this is crucial for cookies to be set
 }));
 
