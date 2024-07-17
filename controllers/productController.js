@@ -1,23 +1,29 @@
 import express from "express";
 import Product from "../models/Product.js";
 
+
 export const addProduct = async (req, res) => {
-  const { name, brand, price, description, img } = req.body;
+  const { name, brand, price, description } = req.body;
+  const img = req.file ? req.file.filename : null;
 
   if (!name || !brand || !price || !description || !img) {
     return res.status(400).json("Please fill all the inputs");
   }
 
-  const product = new Product({
-    name,
-    brand,
-    price,
-    description,
-    img,
-  });
+  try {
+    const product = new Product({
+      name,
+      brand,
+      price,
+      description,
+      img,
+    });
 
-  const savedProduct = await product.save();
-  res.status(200).json(savedProduct);
+    const savedProduct = await product.save();
+    res.status(200).json(savedProduct);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to add product', error });
+  }
 };
 
 export const getAllProducts = async (req, res) => {
@@ -94,3 +100,7 @@ export const getProductByName = async (req, res) => {
     res.status(500).json({ message: "Error getting the product", error });
   }
 };
+
+export const uploadFile = async (req, res) => {
+  res.json(req.file);
+}
