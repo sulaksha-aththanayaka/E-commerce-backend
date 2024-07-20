@@ -20,13 +20,32 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(cors());
 
+// app.use(cors({
+//     origin: ['http://localhost:5173', 'http://192.168.56.1:3000', 'http://192.168.8.117:3000'],// replace with your front-end origin
+// }));
+
+// CORS configuration
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://192.168.56.1:3000',
+    'http://192.168.8.117:3000'
+  ];
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin, like mobile apps or curl requests
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    }
+  }));
+
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(cors({
-    origin: ['http://localhost:5173', 'http://192.168.43.243:3000'],// replace with your front-end origin
-    credentials: true // this is crucial for cookies to be set
-}));
 
 
 const router = express.Router();
