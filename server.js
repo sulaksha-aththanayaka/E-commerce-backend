@@ -33,15 +33,21 @@ const allowedOrigins = [
   
   app.use(cors({
     origin: function (origin, callback) {
-      // allow requests with no origin, like mobile apps or curl requests
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow requests with no origin, like mobile apps or curl requests
       if (allowedOrigins.indexOf(origin) === -1) {
         const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
       }
       return callback(null, true);
-    }
+    },
+    credentials: true
   }));
+  
+  // Middleware to set Access-Control-Allow-Credentials header
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+  });
 
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
