@@ -20,6 +20,10 @@ const productsSchema = mongoose.Schema({
     img: {
         type: String,
         required: [true, "Please add an image of the product"]
+    },
+    featured: {
+        type: Boolean,
+        default: false
     }
 },{
     timestamps: true
