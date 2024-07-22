@@ -3,6 +3,7 @@ import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import roles from '../utils/roles.js'
+import Seller from '../models/Seller.js'
 
 export const registerUser = async (req, res) => {
     const {username, email, password} = req.body;
@@ -10,7 +11,7 @@ export const registerUser = async (req, res) => {
     const OldUser = await User.findOne({email});
 
     if(OldUser){
-        res.status(401).json("User available");
+       return res.status(401).json("User available");
     }
 
     const salt = bcrypt.genSaltSync(10);
@@ -85,4 +86,40 @@ const generateToken = (id, role) => {
 }
 
 
+export const registerSeller = async (req, res) => {
+    const {businessName, sellerName, email, password} = req.body;
 
+    if(!businessName || !sellerName || !email || !password){
+        res.status(401).json("All the fields are required");
+    }
+
+    const oldSeller = await Seller.findOne({email});
+
+    if(oldSeller){
+        return res.status(401).json("Seller already exists");
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    const seller = await Seller.create({
+        businessName,
+        sellerName,
+        email,
+        password: hashedPassword,
+        role: roles.seller
+    });
+
+    const token = generateToken(seller._id, seller.role);
+
+    res.cookie('seller_token', token, {
+        httpOnly: true,
+        secure: false
+    }).status(200).json({
+        _id: seller.id,
+        username: seller.username,
+        email: seller.email,
+        token: token
+    });
+
+}

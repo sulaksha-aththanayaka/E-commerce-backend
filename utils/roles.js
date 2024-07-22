@@ -1,3 +1,3 @@
-const roles = { admin: 'ADMIN', user: 'USER' }
+const roles = { seller: 'SELLER', user: 'USER' }
 
 export default roles;

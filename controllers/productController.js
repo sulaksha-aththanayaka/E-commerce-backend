@@ -3,11 +3,11 @@ import Product from "../models/Product.js";
 
 
 export const addProduct = async (req, res) => {
-  const { name, brand, price, description } = req.body;
-  const img = req.file ? req.file.filename : null;
+  const { name, brand, price, description, img } = req.body;
+  // const img = req.file ? req.file.filename : null;
 
   if (!name || !brand || !price || !description || !img) {
-    return res.status(400).json("Please fill all the inputs");
+    return res.status(400).json("Please fill all the inputs to proceed");
   }
 
   try {

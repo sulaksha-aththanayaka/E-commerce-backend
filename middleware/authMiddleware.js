@@ -24,26 +24,29 @@ export const protect = async (req, res, next) => {
     }
 }
 
+export const protectSeller = async (req, res, next) => {
+    let token;
 
-// export const protect = async (req, res, next) => {
-//     let token;
+    token = req.cookies.seller_token;
 
-//     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-//         try {
-//             token = req.headers.authorization.split(' ')[1];
+    if(token){
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            
+            req.user = await User.findById(decoded.id).select('-password');
 
-//             const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            if(decoded.role != 'SELLER'){
+                res.status(401).json("Not authorized, not a seller");
+            }
 
-//             req.user = await User.findById(decoded.id).select('-password');
+            next();
 
-//             next();
-//         } catch (error) {
-//             console.log(error);
-//             res.status(401).json("Not authorized");
-//         }
-//     }
+        } catch (error) {
+            res.status(401).json("Not authorized, invalid token seller");
+        }
 
-//     if(!token){
-//         res.status(401).json("Not authorized, no token");
-//     }
-// }
+    }else{
+        res.status(401).json("Not authorized, no token");
+    }
+}
+
